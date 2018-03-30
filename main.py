@@ -2,6 +2,7 @@
 import os
 import argparse
 import random
+from time import time
 import numpy as np
 from scipy.misc import imsave
 import tensorflow as tf
@@ -260,6 +261,7 @@ class CycleGAN(object):
       # Training Loop
       for epoch in range(sess.run(self.global_step), self._max_step):
         print("In the epoch ", epoch)
+        start_time = time()
         saver.save(sess, self._ckpt_dir, global_step=epoch)
 
         # Dealing with the learning rate as per the epoch number
@@ -270,7 +272,7 @@ class CycleGAN(object):
 
         self.save_images(sess, epoch)
 
-        for i in range(0, max_image_num):
+        for batch in range(0, max_image_num):
 
           inputs = sess.run(self.inputs)
 
@@ -286,7 +288,7 @@ class CycleGAN(object):
                   self.learning_rate: curr_lr
               }
           )
-          writer.add_summary(summary_str, epoch * max_image_num + i)
+          writer.add_summary(summary_str, epoch * max_image_num + batch)
 
           fake_b_from_pool = self.fake_image_pool(
               self.num_fake_inputs, fake_b_temp, self.fake_b_pool)
@@ -303,7 +305,7 @@ class CycleGAN(object):
                   self.fake_pool_b: fake_b_from_pool
               }
           )
-          writer.add_summary(summary_str, epoch * max_image_num + i)
+          writer.add_summary(summary_str, epoch * max_image_num + batch)
 
           # Optimizing the G_B network
           _, fake_a_temp, gb_loss, summary_str = sess.run(
@@ -317,7 +319,7 @@ class CycleGAN(object):
                   self.learning_rate: curr_lr
               }
           )
-          writer.add_summary(summary_str, epoch * max_image_num + i)
+          writer.add_summary(summary_str, epoch * max_image_num + batch)
 
           fake_a_from_pool = self.fake_image_pool(
               self.num_fake_inputs, fake_a_temp, self.fake_a_pool)
@@ -334,12 +336,15 @@ class CycleGAN(object):
                   self.fake_pool_a: fake_a_from_pool
               }
           )
-          writer.add_summary(summary_str, epoch * max_image_num + i)
+          writer.add_summary(summary_str, epoch * max_image_num + batch)
 
           writer.flush()
           self.num_fake_inputs += 1
-          print('Epoch: %3d, Batch %4d/%d, GA:%.6f, DA:%.6f GB:%.6f, DB:%.6f' %
-                (epoch, i, max_image_num, ga_loss, da_loss, gb_loss, db_loss))
+          used = time() - start_time
+          eta = used * max_image_num / (batch + 1)
+          print('Epoch: %3d, Batch %4d/%d, GA:%.6f, DA:%.6f GB:%.6f, DB:%.6f, Time:%s/%s' %
+                (epoch, batch, max_image_num, ga_loss, da_loss, gb_loss, db_loss,
+                 utils.time2str(used), utils.time2str(eta)))
 
         sess.run(tf.assign(self.global_step, epoch + 1))
 

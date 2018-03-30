@@ -122,3 +122,15 @@ def load_data(dataset_name, image_size_before_crop,
         [inputs['image_a'], inputs['image_b']], 1)
 
   return inputs
+
+
+def time2str(time):
+  assert isinstance(time, float), 'input time must a float!'
+  if time > 3600:
+    time_format = '%d:%02d:%02d' % (
+        time // 3600, (time % 3600) // 60, time % 60)
+  elif time > 60:
+    time_format = '%3d:%02d' % (time // 60, time % 60)
+  else:
+    time_format = '%5ds' % time
+  return time_format
