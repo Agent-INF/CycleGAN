@@ -169,8 +169,8 @@ class CycleGAN(object):
     :param sess: The session.
     :param epoch: Currnt epoch.
     """
-    if not os.path.exists(self._sample_dir):
-      os.makedirs(self._sample_dir)
+    if not os.path.exists(os.path.join(self._sample_dir, 'img')):
+      os.makedirs(os.path.join(self._sample_dir, 'img'))
 
     names = ['input_a_', 'input_b_', 'fake_a_',
              'fake_b_', 'cyc_a_', 'cyc_b_']
@@ -195,9 +195,9 @@ class CycleGAN(object):
 
         for name, tensor in zip(names, tensors):
           image_name = name + str(epoch) + "_" + str(i) + ".jpg"
-          imsave(os.path.join(self._sample_dir, image_name),
+          imsave(os.path.join(self._sample_dir, 'img', image_name),
                  ((tensor[0] + 1) * 127.5).astype(np.uint8))
-          v_html.write("<img src=\"" + image_name + "\">")
+          v_html.write("<img src=\"" + os.path.join('img', image_name) + "\">")
         v_html.write("<br>")
 
   def fake_image_pool(self, num_fakes, fake, fake_pool):
