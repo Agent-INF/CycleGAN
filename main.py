@@ -18,7 +18,7 @@ class CycleGAN(object):
 
     self._pool_size = utils.POOL_SIZE
     self._exp_name = os.path.join(exp_name)
-    self._sample_dir = os.path.join(utils.SAMPLE_DIR, self._exp_name)
+    self._sample_dir = os.path.join(utils.SAMPLE_DIR, self._exp_name, mode)
     self._log_dir = os.path.join(utils.LOG_DIR, self._exp_name)
     self._ckpt_dir = os.path.join(utils.CKPT_DIR, self._exp_name)
     self._num_imgs_to_save = utils.NUM_IMG_TO_SAVE
